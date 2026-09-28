@@ -2,3 +2,4 @@
 build/
 dist/
 .swiftpm/
+Windows/UsageTray/*.exe

@@ -2,6 +2,8 @@
 
 A tiny SwiftUI menu bar app that shows the remaining quota (5h / weekly / model-scoped) of every account in your local [OpenCodex](https://www.npmjs.com/package/@bitkyc08/opencodex) pool — Codex and Claude side by side. Unofficial; not affiliated with OpenAI, Anthropic, or OpenCodex.
 
+**Windows:** [Usage Tray](Windows/UsageTray/README.md)는 Codex와 Claude Code의 남은 사용량을 작업표시줄에 표시하는 별도 앱입니다. OpenCodex 서버 없이 이 PC의 Codex CLI 및 Claude Code 로그인 계정을 사용합니다. Windows용 빌드와 사용 방법은 링크된 문서를 참고하세요.
+
 <img src="docs/screenshot.png" width="360" alt="OCXBar menu">
 
 ## 설치 (Apple Silicon, macOS 13+)
