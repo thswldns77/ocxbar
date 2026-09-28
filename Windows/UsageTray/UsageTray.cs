@@ -414,7 +414,13 @@ namespace UsageTray
             try
             {
                 Process.Start(new ProcessStartInfo(exe, isCodex ? "login" : "auth login") { UseShellExecute = true, WorkingDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) });
-                MessageBox.Show("열린 로그인 창에서 브라우저 인증을 마친 뒤 '새로고침'을 누르세요.", "Usage Tray", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                var guidance = isCodex
+                    ? "열린 로그인 창에서 브라우저 인증을 마친 뒤 '새로고침'을 누르세요."
+                    : "Claude가 다른 Chrome 프로필을 열면 자동으로 열린 창에서는 인증하지 마세요. " +
+                      "로그인 콘솔의 URL을 복사해 원하는 Chrome 프로필의 주소창에 붙여넣으세요. " +
+                      "콘솔에 'c'로 URL 복사 안내가 보이면 Ctrl+C가 아닌 c 키만 누르세요. " +
+                      "인증을 마친 뒤 '새로고침'을 누르세요.";
+                MessageBox.Show(guidance, "Usage Tray", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception e) { MessageBox.Show("로그인 창을 열지 못했습니다: " + e.Message, "Usage Tray", MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }

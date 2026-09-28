@@ -25,6 +25,8 @@ Windows 시작 시 실행은 오른쪽 클릭 메뉴에서 켤 수 있습니다.
 - **Codex:** 이미 Codex CLI에서 ChatGPT 계정으로 로그인했다면 추가 로그인은 필요 없습니다. 새로 로그인하려면 버튼을 누르거나 PowerShell에서 `codex login`을 실행하세요.
 - **Claude Code:** 이 앱은 일반 설치판과 Microsoft Store판 Claude 앱에 포함된 Claude Code 실행 파일을 찾습니다. 상세 창의 **로그인** 버튼을 누르면 `claude auth login`이 열립니다. Claude 앱에 로그인되어 있어도 CLI의 사용량 조회 인증이 별도로 필요할 수 있습니다. 브라우저에서 같은 Claude 구독 계정으로 인증한 뒤 **새로고침**을 누르세요. 실행 파일을 찾지 못할 때만 [Windows용 Claude Code 설치 안내](https://code.claude.com/docs/en/setup)를 따르세요.
 
+Claude 로그인 때 다른 Chrome 프로필이 열리면 그 창에서는 인증하지 말고, 로그인 콘솔의 URL을 복사해 원하는 프로필의 주소창에 붙여넣으세요. 콘솔에 `c`로 URL 복사 안내가 보이면 **Ctrl+C가 아닌 `c` 키만** 누르세요. 인증을 마친 뒤 **새로고침**을 누르세요.
+
 `ocxbar`는 OpenCodex 서버의 계정 풀을 읽지만 이 Windows 앱은 **각 CLI에 직접 로그인한 계정**을 읽습니다. OpenCodex 설치는 필요하지 않습니다. 여러 계정의 사용량을 동시에 보여주는 기능은 현재 포함하지 않습니다.
 
 ## 사용량 데이터
