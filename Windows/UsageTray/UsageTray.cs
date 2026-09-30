@@ -444,6 +444,7 @@ namespace UsageTray
         public TrayApp(Mutex singleInstance)
         {
             mutex = singleInstance;
+            MigrateLegacyStartup();
             dashboard = new Dashboard(RefreshNow);
             codexIcon = MakeIcon("C", Color.FromArgb(30, 75, 69));
             claudeIcon = MakeIcon("A", Color.FromArgb(175, 95, 65));
@@ -490,7 +491,12 @@ namespace UsageTray
             menu.Items.Add(dockOption);
             menu.Items.Add("표시 설정...", null, (s, e) => ShowAppearanceSettings());
             var startup = new ToolStripMenuItem("Windows 시작 시 실행") { Checked = IsStartup() };
-            startup.Click += (s, e) => { SetStartup(!IsStartup()); startup.Checked = IsStartup(); };
+            startup.Click += (s, e) =>
+            {
+                if (!SetStartup(!IsStartup()))
+                    MessageBox.Show("시작프로그램 등록을 변경하지 못했습니다. 폴더 접근 권한을 확인해 주세요.", "Usage Tray", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                startup.Checked = IsStartup();
+            };
             menu.Items.Add(startup);
             menu.Items.Add(new ToolStripSeparator());
             menu.Items.Add("종료", null, (s, e) => ExitThread());
@@ -578,8 +584,19 @@ namespace UsageTray
 
         private static bool IsStartup()
         {
+            if (File.Exists(StartupShortcutPath)) return true;
             using (var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run"))
                 return key != null && key.GetValue("UsageTray") != null;
+        }
+        private static string StartupShortcutPath
+        {
+            get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), "UsageTray.lnk"); }
+        }
+        private static void MigrateLegacyStartup()
+        {
+            using (var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run"))
+                if (key == null || key.GetValue("UsageTray") == null) return;
+            SetStartup(true);
         }
         private static bool ReadShowSummaryStrip()
         {
@@ -617,14 +634,38 @@ namespace UsageTray
             }
             catch { }
         }
-        private static void SetStartup(bool enabled)
+        private static bool SetStartup(bool enabled)
         {
-            using (var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true))
+            try
             {
-                if (key == null) return;
-                if (enabled) key.SetValue("UsageTray", "\"" + Application.ExecutablePath + "\"");
-                else key.DeleteValue("UsageTray", false);
+                var shortcutPath = StartupShortcutPath;
+                if (enabled)
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(shortcutPath));
+                    object shell = null;
+                    object shortcut = null;
+                    try
+                    {
+                        shell = Activator.CreateInstance(Type.GetTypeFromProgID("WScript.Shell"));
+                        shortcut = ((dynamic)shell).CreateShortcut(shortcutPath);
+                        ((dynamic)shortcut).TargetPath = Application.ExecutablePath;
+                        ((dynamic)shortcut).WorkingDirectory = Path.GetDirectoryName(Application.ExecutablePath);
+                        ((dynamic)shortcut).Description = "Codex와 Claude Code 사용량 표시";
+                        ((dynamic)shortcut).Save();
+                    }
+                    finally
+                    {
+                        if (shortcut != null && Marshal.IsComObject(shortcut)) Marshal.FinalReleaseComObject(shortcut);
+                        if (shell != null && Marshal.IsComObject(shell)) Marshal.FinalReleaseComObject(shell);
+                    }
+                    if (!File.Exists(shortcutPath)) return false;
+                }
+                else if (File.Exists(shortcutPath)) File.Delete(shortcutPath);
+                using (var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true))
+                    if (key != null) key.DeleteValue("UsageTray", false);
+                return true;
             }
+            catch { return false; }
         }
         protected override void ExitThreadCore()
         {

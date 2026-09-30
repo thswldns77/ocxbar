@@ -4,7 +4,7 @@ if (-not (Test-Path -LiteralPath $compiler)) {
     throw 'Windows .NET Framework C# compiler was not found.'
 }
 
-$references = @('/r:System.Windows.Forms.dll', '/r:System.Drawing.dll', '/r:System.Web.Extensions.dll')
+$references = @('/r:System.Windows.Forms.dll', '/r:System.Drawing.dll', '/r:System.Web.Extensions.dll', '/r:Microsoft.CSharp.dll')
 Push-Location $PSScriptRoot
 try {
     & $compiler /nologo /target:winexe /out:UsageTray.exe $references UsageTray.cs
